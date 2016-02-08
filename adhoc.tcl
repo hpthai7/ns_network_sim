@@ -10,12 +10,17 @@ set val(ant)          Antenna/OmniAntenna      ;# Antenna type
 set val(prop)         Propagation/TwoRayGround ;# radio-propagation model
 set val(netif)        Phy/WirelessPhy          ;# network interface type - TODO: study Phy/WirelessPhyExt
 set val(chan)         Channel/WirelessChannel  ;# channel type
-set val(nn)           3                        ;# number of mobilenodes
-set val(stop)         50                       ;# time of simulation end
+set val(nn)           7                        ;# number of mobilenodes
+set val(endtime)      50                       ;# time of simulation end
+set val(endtimeX)     50.1                     ;# extra time of simulation end
 set val(x) 1000;
 set val(y) 1000;
+
 #create simulator
 set simadhoc [new Simulator]
+#Define different colors for data flows (for NAM)
+$simadhoc color 1 Blue
+$simadhoc color 2 Red
 
 set tr_events [open adhoc_trace_events.tr w]
 set tr_windowVsTime2 [open adhoc_win.tr w]
@@ -47,88 +52,81 @@ $simadhoc node-config -adhocRouting $val(rp) \
                  -phyTrace ON \
                  -movementTrace ON
 
-# Variable de random utilisée pour un point sur la grille
-set size_ [new RandomVariable/Uniform]; # Variable Random uniforme
-$size_ set min_ 1; # Valeur minimum
-$size_ set max_ 999; # Valeur maximum
+# set size_ [new RandomVariable/Uniform];
+# $size_ set min_ 1;
+# $size_ set max_ 999;
 
 # nn = 7
 for {set i 0} {$i < $val(nn) } {incr i} {
     puts $i;
-    # set X [expr round([$size_ value])]; # Position X en random sur la grille
-    # set Y [expr round([$size_ value])]; # Position Y en random sur la grille
+    # set X [expr round([$size_ value])];
+    # set Y [expr round([$size_ value])];
     set node_($i) [$simadhoc node]
-    # $node_($i) random-motion 0; # disable random motion
-    # $node_($i) set X_ $X]; # Position X du nœud sur la grille
-    # $node_($i) set Y_ $Y]; # Position Y du nœud sur la grille
-    # $node_($i) set Z_ 0.0; # Position Z du nœud sur la grille
 }
 
-$node_(0) set X_ 50.0
-$node_(0) set Y_ 200.0
+$node_(0) set X_ 500.0
+$node_(0) set Y_ 500.0
 $node_(0) set Z_ 0.0
 
-$node_(1) set X_ 350.0
-$node_(1) set Y_ 200.0
+$node_(1) set X_ 400.0
+$node_(1) set Y_ 400.0
 $node_(1) set Z_ 0.0
 
-$node_(2) set X_ 150.0
-$node_(2) set Y_ 230.0
+$node_(2) set X_ 650.0
+$node_(2) set Y_ 400.0
 $node_(2) set Z_ 0.0
 
+$node_(3) set X_ 600.0
+$node_(3) set Y_ 680.0
+$node_(3) set Z_ 0.0
+
+$node_(4) set X_ 300.0
+$node_(4) set Y_ 580.0
+$node_(4) set Z_ 0.0
+
+$node_(5) set X_ 200.0
+$node_(5) set Y_ 730.0
+$node_(5) set Z_ 0.0
+
+$node_(6) set X_ 800.0
+$node_(6) set Y_ 700.0
+$node_(6) set Z_ 0.0
 # $simadhoc at 5.0 "$node_(0) setdest 250.0 250.0 3.0"
 # $simadhoc at 12.0 "$node_(1) setdest 45.0 285.0 5.0"
 # $simadhoc at 18.0 "$node_(0) setdest 480.0 300.0 5.0"
 
-
-# $node_(3) set X_ 35.0;
-# $node_(3) set Y_ 100.0;
-# $node_(3) set Z_ 0.0;
-
-# $node_(4) set X_ 50.0;
-# $node_(4) set Y_ 20.0;
-# $node_(4) set Z_ 0.0;
-
-# $node_(5) set X_ 20.0;
-# $node_(5) set Y_ 50.0;
-# $node_(5) set Z_ 0.0;
-
-# $node_(6) set X_ 45.0;
-# $node_(6) set Y_ 10.0;
-# $node_(6) set Z_ 0.0;
-
-# #CBR/UDP
-# #create a CBR traffic source and attach it to udp
-# set cbr [new Application/Traffic/CBR]
-# $cbr set packetSize_ 1000
-# $cbr set interval_ 0.005
-
-# #create a UDP agent and attach it to node_(1)
-# set udp [new Agent/UDP]
-# $simadhoc attach-agent $node_(0) $udp
-# #create and attach null agent to node_(6)
-# set null [new Agent/Null]
-# $simadhoc attach-agent $node_(2) $null
-# $simadhoc connect $udp $null
-
-# $cbr attach-agent $udp
+#CBR/UDP
+#create a UDP agent and attach it to node_(1)
+set udp [new Agent/UDP]
+$simadhoc attach-agent $node_(1) $udp
+#create and attach null agent to node_(6)
+set null [new Agent/Null]
+$simadhoc attach-agent $node_(6) $null
+$simadhoc connect $udp $null
+$udp set fid_ 1
+#create a CBR traffic source and attach it to udp
+set cbr [new Application/Traffic/CBR]
+$cbr set packetSize_ 1000
+$cbr set interval_ 0.005
+$cbr attach-agent $udp
 
 #FTP/TCP
 set tcp [new Agent/TCP]; #create TCP sender agent
-$tcp set class_ 2;
 set sink [new Agent/TCPSink]; #create receiver agent
-$simadhoc attach-agent $node_(0) $tcp; #put sender on node_(5)
-$simadhoc attach-agent $node_(1) $sink; #put receiver on node_(2)
+$simadhoc attach-agent $node_(5) $tcp; #put sender on node_(5)
+$simadhoc attach-agent $node_(2) $sink; #put receiver on node_(2)
 $simadhoc connect $tcp $sink; #establish TCP connection
+$tcp set fid_ 2
+$tcp set type_ FTP
 
 set ftp [new Application/FTP]; #create FTP source application
 $ftp attach-agent $tcp; #associate FTP with the TCP sender
 
-# $simadhoc at 1.0 "$cbr start"
-# $simadhoc at 10.0 "$cbr stop"
+$simadhoc at 1.0 "$cbr start"
+$simadhoc at $val(endtime) "$cbr stop"
 
 $simadhoc at 1 "$ftp start"
-$simadhoc at $val(stop) "$ftp stop"
+$simadhoc at $val(endtime) "$ftp stop"
 
 # Printing the window size
 proc plotWindow {tcpSource file} {
@@ -139,7 +137,7 @@ proc plotWindow {tcpSource file} {
     puts $file "$now $cwnd"
     $simadhoc at [expr $now+$time] "plotWindow $tcpSource $file"
 }
-$simadhoc at $val(stop) "plotWindow $tcp $tr_windowVsTime2"
+$simadhoc at $val(endtime) "plotWindow $tcp $tr_windowVsTime2"
 
 # Define node initial position in nam
 for {set i 0} {$i < $val(nn)} { incr i } {
@@ -149,13 +147,8 @@ for {set i 0} {$i < $val(nn)} { incr i } {
 
 # Telling nodes when the simulation ends
 for {set i 0} {$i < $val(nn) } { incr i } {
-    $simadhoc at $val(stop) "$node_($i) reset";
+    $simadhoc at $val(endtime) "$node_($i) reset";
 }
-
-# ending nam and the simulation
-$simadhoc at $val(stop) "$simadhoc nam-end-wireless $val(stop)"
-$simadhoc at $val(stop) "finish"
-$simadhoc at $val(stop) "puts \"end simulation\" ; $simadhoc halt"
 
 proc finish {} {
     global simadhoc tr_events tr_nam
@@ -165,6 +158,9 @@ proc finish {} {
     exit 0
 }
 
-# $simadhoc at 10.1 "finish"
+# ending nam and the simulation
+$simadhoc at $val(endtime) "$simadhoc nam-end-wireless $val(endtime)"
+$simadhoc at $val(endtimeX) "finish"
+$simadhoc at $val(endtimeX) "puts \"end simulation\" ; $simadhoc halt"
 
 $simadhoc run
