@@ -1,7 +1,7 @@
 # ======================================================================
 # Define options
 # ======================================================================
-set val(rp)           AODV                     ;# ad-hoc routing protocol 
+set val(rp)           AODV; #DSDV                     ;# ad-hoc routing protocol 
 set val(ll)           LL                       ;# Link layer type
 set val(mac)          Mac/802_11               ;# MAC type - TODO: study Mac/802_11Ext
 set val(ifq)          Queue/DropTail/PriQueue  ;# Interface queue type
@@ -91,6 +91,7 @@ $node_(5) set Z_ 0.0
 $node_(6) set X_ 800.0
 $node_(6) set Y_ 700.0
 $node_(6) set Z_ 0.0
+
 # $simadhoc at 5.0 "$node_(0) setdest 250.0 250.0 3.0"
 # $simadhoc at 12.0 "$node_(1) setdest 45.0 285.0 5.0"
 # $simadhoc at 18.0 "$node_(0) setdest 480.0 300.0 5.0"
@@ -129,15 +130,15 @@ $simadhoc at 1 "$ftp start"
 $simadhoc at $val(endtime) "$ftp stop"
 
 # Printing the window size
-proc plotWindow {tcpSource file} {
-    global simadhoc
-    set time 0.01
-    set now [$simadhoc now]
-    set cwnd [$tcpSource set cwnd_]
-    puts $file "$now $cwnd"
-    $simadhoc at [expr $now+$time] "plotWindow $tcpSource $file"
-}
-$simadhoc at $val(endtime) "plotWindow $tcp $tr_windowVsTime2"
+# proc plotWindow {tcpSource file} {
+#     global simadhoc
+#     set time 0.01
+#     set now [$simadhoc now]
+#     set cwnd [$tcpSource set cwnd_]
+#     puts $file "$now $cwnd"
+#     $simadhoc at [expr $now+$time] "plotWindow $tcpSource $file"
+# }
+# $simadhoc at $val(endtime) "plotWindow $tcp $tr_windowVsTime2"
 
 # Define node initial position in nam
 for {set i 0} {$i < $val(nn)} { incr i } {

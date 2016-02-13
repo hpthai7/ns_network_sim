@@ -19,6 +19,8 @@ $sim duplex-link $Node1 $Node2 1Mb 5ms DropTail
 set cbr [new Application/Traffic/CBR]
 $cbr set packetSize_ 1000
 $cbr set interval_ 0.005
+$cbr set rate_ 2Mb
+
 
 #create a UDP agent and attach it to node n0
 set udp [new Agent/UDP]

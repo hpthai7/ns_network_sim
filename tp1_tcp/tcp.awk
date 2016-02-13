@@ -44,7 +44,7 @@ END {
     print "Valeur moyenne de delai  = " average_delay " s";
 
     # average bitrate should be the last calculated bitrate
-    print "Valeur moyenne de debit  = " averageBitrate " bps";
+    print "Valeur moyenne de debit  = " averageBitrate / 1000 / 1000 " Mbps";
 }
 
 function getAverageDelay(arr, max_size) {
