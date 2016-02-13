@@ -57,65 +57,21 @@ $simadhoc node-config -adhocRouting $val(rp) \
                  -phyTrace ON \
                  -movementTrace ON
 
-# set size_ [new RandomVariable/Uniform];
-# $size_ set min_ 1;
-# $size_ set max_ 999;
+set size_ [new RandomVariable/Uniform];
+$size_ set min_ 1;
+$size_ set max_ 999;
 
-# nn = 7
 for {set i 0} {$i < $val(nn) } {incr i} {
     puts $i;
-    # set X [expr round([$size_ value])];
     # set Y [expr round([$size_ value])];
-    set node_($i) [$simadhoc node]
+    # set X [expr round([$size_ value])];
+    set X [expr { floor(rand() * 1001) }];
+    set Y [expr { floor(rand() * 1001) }];
+    set node_($i) [$simadhoc node];
+    $node_($i) set X_ $X;
+    $node_($i) set Y_ $Y;
+    $node_($i) set Z_ 0.0;
 }
-
-$node_(0) set X_ 500.0
-$node_(0) set Y_ 500.0
-$node_(0) set Z_ 0.0
-
-$node_(1) set X_ 400.0
-$node_(1) set Y_ 400.0
-$node_(1) set Z_ 0.0
-
-$node_(2) set X_ 650.0
-$node_(2) set Y_ 400.0
-$node_(2) set Z_ 0.0
-
-$node_(3) set X_ 600.0
-$node_(3) set Y_ 680.0
-$node_(3) set Z_ 0.0
-
-$node_(4) set X_ 300.0
-$node_(4) set Y_ 580.0
-$node_(4) set Z_ 0.0
-
-$node_(5) set X_ 200.0
-$node_(5) set Y_ 730.0
-$node_(5) set Z_ 0.0
-
-$node_(6) set X_ 800.0
-$node_(6) set Y_ 700.0
-$node_(6) set Z_ 0.0
-
-# $node_(7) set X_ 450.0
-# $node_(7) set Y_ 450.0
-# $node_(7) set Z_ 0.0
-
-# $node_(8) set X_ 580.0
-# $node_(8) set Y_ 450.0
-# $node_(8) set Z_ 0.0
-
-# $node_(9) set X_ 620.0
-# $node_(9) set Y_ 620.0
-# $node_(9) set Z_ 0.0
-
-# $node_(10) set X_ 350.0
-# $node_(10) set Y_ 650.0
-# $node_(10) set Z_ 0.0
-
-# $simadhoc at 5.0 "$node_(0) setdest 250.0 250.0 3.0"
-# $simadhoc at 12.0 "$node_(1) setdest 45.0 285.0 5.0"
-# $simadhoc at 18.0 "$node_(0) setdest 480.0 300.0 5.0"
 
 #CBR/UDP
 #create a UDP agent and attach it to node_(1)
